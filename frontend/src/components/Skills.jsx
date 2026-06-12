@@ -1,139 +1,151 @@
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getApiUrl } from '../utils/api';
 import './Skills.css';
 
-const Skills = () => {
-  const [skills, setSkills] = useState([]);
-
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const res = await fetch(getApiUrl('/api/skills'));
-        const data = await res.json();
-        setSkills(data);
-      } catch (error) {
-        console.error('Error fetching skills:', error);
-      }
-    };
-    fetchSkills();
-  }, []);
-
-  // Categories that use progress bars
+const Skills = ({ skills = [] }) => {
   const progressCategories = [
-    { key: 'frontend', title: 'Frontend Development' },
-    { key: 'backend', title: 'Backend & Database' }
+    { key: 'frontend', title: 'Frontend Development', icon: '🎨' },
+    { key: 'backend', title: 'Backend & Database', icon: '⚙️' },
   ];
 
-  // Tools category — rendered as scrolling badges
-  const toolsSkills = skills.filter(skill => skill.category === 'tools');
+  const toolsSkills = skills.filter((s) => s.category === 'tools');
 
   const getLogoSrc = (skill) => {
-    if (skill.logoUrl) {
+    if (skill.logoUrl)
       return skill.logoUrl.startsWith('http') ? skill.logoUrl : getApiUrl(skill.logoUrl);
-    }
-    if (skill.icon && (skill.icon.startsWith('http') || skill.icon.startsWith('/')) ) {
+    if (skill.icon && (skill.icon.startsWith('http') || skill.icon.startsWith('/')))
       return skill.icon.startsWith('http') ? skill.icon : getApiUrl(skill.icon);
-    }
     return null;
   };
 
-  const renderSkillIcon = (skill) => {
-    const logoSrc = getLogoSrc(skill);
-    if (logoSrc) {
-      return <img src={logoSrc} alt={skill.name} className="skill-logo-mini" />;
-    }
-    if (skill.icon && skill.icon.startsWith('<svg')) {
-      return (
-        <div
-          className="skill-logo-mini"
-          style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          dangerouslySetInnerHTML={{ __html: skill.icon }}
-        />
-      );
-    }
+  const renderIcon = (skill) => {
+    const src = getLogoSrc(skill);
+    if (src) return <img src={src} alt={skill.name} className="skill-logo-mini" />;
+    if (skill.icon?.startsWith('<svg'))
+      return <div className="skill-logo-mini skill-svg-icon" dangerouslySetInnerHTML={{ __html: skill.icon }} />;
     return <div className="skill-logo-mini skill-icon-fallback">{skill.icon || '⚡'}</div>;
   };
 
-  // Split tools into two rows for a better visual
-  const midpoint = Math.ceil(toolsSkills.length / 2);
-  const toolsRow1 = toolsSkills.slice(0, midpoint);
-  const toolsRow2 = toolsSkills.slice(midpoint);
+  const mid = Math.ceil(toolsSkills.length / 2);
+  const row1 = toolsSkills.slice(0, mid);
+  const row2 = toolsSkills.slice(mid);
+
+  const buildMarqueeItems = (items, prefix) =>
+    [...items, ...items, ...items].map((skill, i) => ({
+      skill,
+      key: `${prefix}-${skill._id || skill.name}-${i}`,
+    }));
 
   return (
     <section id="skills" className="skills-section">
+      <div className="skills-bg-orb skills-bg-orb--1" aria-hidden="true" />
+      <div className="skills-bg-orb skills-bg-orb--2" aria-hidden="true" />
+
       <div className="container">
-        <h2 className="section-title">Technical skills</h2>
+        <motion.div
+          className="skills-header"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="section-title">Technical Skills</h2>
+          <p className="section-subtitle">
+            Languages, frameworks, and tools I use to build reliable, user-focused products.
+          </p>
+        </motion.div>
 
-        {/* Progress bar categories: Frontend & Backend */}
         <div className="skills-main-row">
-          {progressCategories.map((cat) => {
-            const categorySkills = skills.filter(skill => skill.category === cat.key);
-            if (categorySkills.length === 0) return null;
-
+          {progressCategories.map((cat, ci) => {
+            const catSkills = skills.filter((s) => s.category === cat.key);
+            if (!catSkills.length) return null;
             return (
-              <div key={cat.key} className="skill-category-box glass-morphism">
-                <h3>{cat.title}</h3>
+              <motion.div
+                key={cat.key}
+                className="skill-category-box glass-morphism"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: ci * 0.15 }}
+              >
+                <h3>
+                  <span className="skill-cat-icon">{cat.icon}</span>
+                  {cat.title}
+                </h3>
                 <div className="skills-mini-grid">
-                  {categorySkills.map((skill, i) => {
-                    return (
-                      <div key={i} className="skill-item-mini">
-                        <div className="skill-header-mini">
-                          {renderSkillIcon(skill)}
-                          <div className="skill-info-mini">
-                            <span>{skill.name}</span>
-                            <span>{skill.proficiency}%</span>
-                          </div>
-                        </div>
-                        <div className="progress-bar-mini">
-                          <motion.div
-                            className="progress"
-                            initial={{ width: 0 }}
-                            whileInView={{ width: `${skill.proficiency}%` }}
-                            transition={{ duration: 1, ease: 'easeOut' }}
-                            viewport={{ once: true }}
-                          ></motion.div>
+                  {catSkills.map((skill, i) => (
+                    <div
+                      key={skill._id || `${cat.key}-${skill.name}`}
+                      className="skill-item-mini"
+                      style={{ '--skill-color': skill.color || '#6366f1' }}
+                    >
+                      <div className="skill-header-mini">
+                        <div className="skill-icon-wrap">{renderIcon(skill)}</div>
+                        <div className="skill-info-mini">
+                          <span>{skill.name}</span>
+                          <span className="skill-pct">{skill.proficiency}%</span>
                         </div>
                       </div>
-                    );
-                  })}
+                      <div className="progress-bar-mini">
+                        <motion.div
+                          className="progress"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${skill.proficiency}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1.2, ease: 'easeOut', delay: i * 0.06 }}
+                          style={{ '--skill-color': skill.color || '#6366f1' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
-        {/* Tools & Technologies — Scrolling Marquee */}
         {toolsSkills.length > 0 && (
-          <div className="tools-marquee-section">
+          <motion.div
+            className="tools-marquee-section"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h3 className="tools-marquee-title">Tools & Technologies</h3>
 
-            {/* Row 1: scrolls left */}
             <div className="marquee-track">
               <div className="marquee-content scroll-left">
-                {[...toolsRow1, ...toolsRow1, ...toolsRow1].map((skill, i) => (
-                  <div key={i} className="tool-chip glass-morphism" style={{ '--chip-color': skill.color || '#6366f1' }}>
-                    {renderSkillIcon(skill)}
+                {buildMarqueeItems(row1, 'r1').map(({ skill, key }) => (
+                  <div
+                    key={key}
+                    className="tool-chip glass-morphism"
+                    style={{ '--chip-color': skill.color || '#6366f1' }}
+                  >
+                    {renderIcon(skill)}
                     <span>{skill.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Row 2: scrolls right */}
-            {toolsRow2.length > 0 && (
+            {row2.length > 0 && (
               <div className="marquee-track">
                 <div className="marquee-content scroll-right">
-                  {[...toolsRow2, ...toolsRow2, ...toolsRow2].map((skill, i) => (
-                    <div key={i} className="tool-chip glass-morphism" style={{ '--chip-color': skill.color || '#6366f1' }}>
-                      {renderSkillIcon(skill)}
+                  {buildMarqueeItems(row2, 'r2').map(({ skill, key }) => (
+                    <div
+                      key={key}
+                      className="tool-chip glass-morphism"
+                      style={{ '--chip-color': skill.color || '#6366f1' }}
+                    >
+                      {renderIcon(skill)}
                       <span>{skill.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

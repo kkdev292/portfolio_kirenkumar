@@ -1,59 +1,89 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { getApiUrl } from '../utils/api';
 import './Contact.css';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [status, setStatus] = useState('');
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [status, setStatus] = useState('');  // '', 'sending', 'success', 'error'
+  const [focused, setFocused] = useState({});
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleFocus = name => setFocused(f => ({ ...f, [name]: true }));
+  const handleBlur  = name => setFocused(f => ({ ...f, [name]: false }));
+
+  const isActive = (name) => focused[name] || formData[name];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('Sending...');
+    setStatus('sending');
     try {
       const res = await fetch(getApiUrl('/api/messages'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
       if (res.ok) {
-        setStatus('Message sent successfully!');
+        setStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
+        setTimeout(() => setStatus(''), 5000);
       } else {
-        setStatus('Failed to send message.');
+        setStatus('error');
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setStatus('Error occurred.');
+    } catch {
+      setStatus('error');
     }
   };
 
   return (
     <section id="contact" className="contact-section">
+      {/* bg orb */}
+      <div className="contact-orb" />
+
       <div className="container">
-        <h2 className="section-title">Get In Touch</h2>
+        <motion.h2
+          className="section-title"
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          Get In Touch
+        </motion.h2>
+
         <div className="contact-grid">
-          <div className="contact-info">
-            <h3>Let's talk about your project!</h3>
-            <p>I’m always open to discussing new projects, creative ideas, or opportunities to be part of your visions. Whether you have a fully-fleshed-out brief or just a spark of an idea, I’d love to help you bring it to life. I believe the best work comes from great conversations, so don’t hesitate to reach out—let’s build something impactful together."</p>
+          {/* Left info */}
+          <motion.div
+            className="contact-info"
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h3>Let's build something great together!</h3>
+            <p>
+              I'm always open to discussing new projects, creative ideas, or opportunities.
+              Whether you have a brief or just a spark of an idea — let's talk!
+            </p>
+
             <div className="contact-details">
-              <div className="detail-item">
-                <strong>Email:</strong> kirenkumar.dev424@gmail.com
-              </div>
-              <div className="detail-item">
-                <strong>Phone:</strong> +91 7845928388
-              </div>
-              <div className="detail-item">
-                <strong>Location:</strong> Sivaganga, TamilNadu
-              </div>
+              {[
+                { icon: '✉️', label: 'Email', value: 'kirenkumar.dev424@gmail.com', href: 'mailto:kirenkumar.dev424@gmail.com' },
+                { icon: '📱', label: 'Phone', value: '+91 7845928388', href: 'tel:+917845928388' },
+                { icon: '📍', label: 'Location', value: 'Sivaganga, TamilNadu', href: null },
+              ].map(({ icon, label, value, href }) => (
+                <div key={label} className="detail-item">
+                  <div className="detail-icon">{icon}</div>
+                  <div>
+                    <span className="detail-label">{label}</span>
+                    {href ? (
+                      <a href={href} className="detail-value">{value}</a>
+                    ) : (
+                      <span className="detail-value">{value}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="contact-socials">
@@ -63,50 +93,73 @@ const Contact = () => {
               <a href="https://github.com/kk-projects292/" target="_blank" rel="noreferrer" title="GitHub"><img src="https://cdn.simpleicons.org/github/white" alt="GitHub" /></a>
               <a href="https://www.instagram.com/kk_dev424/" target="_blank" rel="noreferrer" title="Instagram"><img src="https://cdn.simpleicons.org/instagram" alt="Instagram" /></a>
             </div>
-          </div>
-          <form className="contact-form glass-morphism" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <input
-                type="text"
-                name="subject"
-                placeholder="Subject"
-                value={formData.subject}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
+          </motion.div>
+
+          {/* Right form */}
+          <motion.form
+            className="contact-form glass-morphism"
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
+            {/* Floating label fields */}
+            {[
+              { name: 'name',    type: 'text',  label: 'Your Name',    tag: 'input' },
+              { name: 'email',   type: 'email', label: 'Email Address', tag: 'input' },
+              { name: 'subject', type: 'text',  label: 'Subject',      tag: 'input' },
+            ].map(({ name, type, label }) => (
+              <div key={name} className={`float-group ${isActive(name) ? 'active' : ''}`}>
+                <input
+                  type={type}
+                  name={name}
+                  id={`contact-${name}`}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus(name)}
+                  onBlur={() => handleBlur(name)}
+                  autoComplete="off"
+                  required={name !== 'subject'}
+                />
+                <label htmlFor={`contact-${name}`}>{label}</label>
+                <div className="float-border" />
+              </div>
+            ))}
+
+            <div className={`float-group float-group--textarea ${isActive('message') ? 'active' : ''}`}>
               <textarea
                 name="message"
-                placeholder="Message"
-                rows="3"
+                id="contact-message"
+                rows="4"
                 value={formData.message}
                 onChange={handleChange}
+                onFocus={() => handleFocus('message')}
+                onBlur={() => handleBlur('message')}
                 required
-              ></textarea>
+              />
+              <label htmlFor="contact-message">Your Message</label>
+              <div className="float-border" />
             </div>
-            <button type="submit" className="btn btn-primary w-full">Send Message</button>
-            {status && <p className="status-msg">{status}</p>}
-          </form>
+
+            <button type="submit" className="btn btn-primary w-full" disabled={status === 'sending'}>
+              {status === 'sending' ? (
+                <><span className="btn-spinner" /> Sending...</>
+              ) : 'Send Message'}
+            </button>
+
+            {/* Status feedback */}
+            {status === 'success' && (
+              <motion.div className="contact-status success" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                ✅ Message sent successfully! I'll get back to you soon.
+              </motion.div>
+            )}
+            {status === 'error' && (
+              <motion.div className="contact-status error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                ❌ Something went wrong. Please try again.
+              </motion.div>
+            )}
+          </motion.form>
         </div>
       </div>
     </section>

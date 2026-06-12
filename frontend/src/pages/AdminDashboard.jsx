@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../utils/cropImage';
 import { getApiUrl } from '../utils/api';
+import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from '../components/Toast';
 import './AdminDashboard.css';
 
 const SkeletonLoader = ({ type }) => {
@@ -112,6 +114,8 @@ const AdminDashboard = () => {
     color: '#6366f1',
     order: 0
   });
+  const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
+  const [skillFilter, setSkillFilter] = useState('all');
 
   useEffect(() => {
     const loadAllData = async () => {
@@ -156,12 +160,12 @@ const AdminDashboard = () => {
     });
     
     if (res.ok) {
-      alert('Profile updated!');
+      toast.success('Profile updated!');
       setProfile({ ...profile, password: '' });
     } else {
       const error = await res.json();
       console.error('Update Profile Error:', error);
-      alert('Error updating profile: ' + (error.message || 'Unknown error'));
+      toast.error('Error updating profile: ' + (error.message || 'Unknown error'));
     }
   };
 
@@ -213,19 +217,19 @@ const AdminDashboard = () => {
           },
           body: JSON.stringify(updatedProfile)
         });
-        alert('Profile photo updated!');
+        toast.success('Profile photo updated!');
       } else if (cropType === 'project') {
         setNewProject(prev => ({ ...prev, imageUrl: data.url }));
         console.log('Project Image Uploaded:', data.url);
-        alert('Project image uploaded!');
+        toast.success('Project image uploaded!');
       } else if (cropType === 'skill') {
         setNewSkill(prev => ({ ...prev, logoUrl: data.url }));
         console.log('Skill Logo Uploaded:', data.url);
-        alert('Skill logo uploaded!');
+        toast.success('Skill logo uploaded!');
       } else if (cropType === 'skill-icon') {
         setNewSkill(prev => ({ ...prev, icon: data.url }));
         console.log('Skill Icon Uploaded:', data.url);
-        alert('Skill icon uploaded!');
+        toast.success('Skill icon uploaded!');
       }
 
       setUploading(false);
@@ -277,11 +281,11 @@ const AdminDashboard = () => {
       setEditingId(null);
       fetchProjects();
       setNewProject({ title: '', description: '', techStack: '', imageUrl: '', demoLink: '', githubLink: '' });
-      alert(editingId ? 'Project updated!' : 'Project added!');
+      toast.success(editingId ? 'Project updated!' : 'Project added!');
     } else {
       const error = await res.json();
       console.error('Project Save Error:', error);
-      alert('Error saving project: ' + (error.message || 'Unknown error'));
+      toast.error('Error saving project: ' + (error.message || 'Unknown error'));
     }
   };
 
@@ -375,13 +379,13 @@ const AdminDashboard = () => {
       });
 
       if (saveRes.ok) {
-        alert('Resume uploaded successfully!');
+        toast.success('Resume uploaded successfully!');
         fetchResume();
       }
       setUploading(false);
     } catch (err) {
       console.error(err);
-      alert('Error uploading resume');
+      toast.error('Error uploading resume');
       setUploading(false);
     }
   };
@@ -420,14 +424,14 @@ const AdminDashboard = () => {
           description: ''
         });
         fetchCertificates();
-        alert(editingId ? 'Certificate updated!' : 'Certificate added!');
+        toast.success(editingId ? 'Certificate updated!' : 'Certificate added!');
       } else {
         const error = await res.json();
-        alert('Error: ' + (error.message || 'Unknown error'));
+        toast.error('Error: ' + (error.message || 'Unknown error'));
       }
     } catch (err) {
       console.error(err);
-      alert('Error adding certificate');
+      toast.error('Error adding certificate');
     }
   };
 
@@ -451,11 +455,11 @@ const AdminDashboard = () => {
 
       const data = await res.json();
       setNewCertificate({ ...newCertificate, imageUrl: data.url, filename: file.name });
-      alert('Certificate image uploaded!');
+      toast.success('Certificate image uploaded!');
       setUploading(false);
     } catch (err) {
       console.error(err);
-      alert('Error uploading certificate image');
+      toast.error('Error uploading certificate image');
       setUploading(false);
     }
   };
@@ -469,10 +473,10 @@ const AdminDashboard = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       fetchCertificates();
-      alert('Certificate deleted!');
+      toast.success('Certificate deleted!');
     } catch (err) {
       console.error(err);
-      alert('Error deleting certificate');
+      toast.error('Error deleting certificate');
     }
   };
 
@@ -530,14 +534,14 @@ const AdminDashboard = () => {
           order: 0
         });
         fetchSkills();
-        alert(editingId ? 'Skill updated!' : 'Skill added!');
+        toast.success(editingId ? 'Skill updated!' : 'Skill added!');
       } else {
         const error = await res.json();
-        alert('Error: ' + (error.message || 'Unknown error'));
+        toast.error('Error: ' + (error.message || 'Unknown error'));
       }
     } catch (err) {
       console.error(err);
-      alert('Error adding skill');
+      toast.error('Error adding skill');
     }
   };
 
@@ -550,10 +554,10 @@ const AdminDashboard = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       fetchSkills();
-      alert('Skill deleted!');
+      toast.success('Skill deleted!');
     } catch (err) {
       console.error(err);
-      alert('Error deleting skill');
+      toast.error('Error deleting skill');
     }
   };
 
@@ -572,31 +576,57 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="admin-dashboard container">
-      <div className="admin-header">
-        <h1>Admin Dashboard</h1>
-        <button onClick={handleLogout} className="btn-logout-enhanced">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" className="logout-icon">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-          <span>Logout</span>
-        </button>
-      </div>
+    <div className={`admin-layout ${isSidebarMinimized ? 'sidebar-minimized' : ''}`}>
+      <ToastContainer />
+      <aside className="admin-sidebar">
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <Link to="/">KK</Link>
+          </div>
+          <button className="sidebar-toggle-btn" onClick={() => setIsSidebarMinimized(!isSidebarMinimized)}>
+            {isSidebarMinimized ? '▶' : '◀'}
+          </button>
+        </div>
+        <nav className="sidebar-nav">
+          <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>
+            <span className="sidebar-icon">🚀</span> <span className="sidebar-text">Projects</span>
+          </button>
+          <button className={activeTab === 'certificates' ? 'active' : ''} onClick={() => setActiveTab('certificates')}>
+            <span className="sidebar-icon">🏆</span> <span className="sidebar-text">Certificates</span>
+          </button>
+          <button className={activeTab === 'skills' ? 'active' : ''} onClick={() => setActiveTab('skills')}>
+            <span className="sidebar-icon">⚡</span> <span className="sidebar-text">Skills</span>
+          </button>
+          <button className={activeTab === 'resume' ? 'active' : ''} onClick={() => setActiveTab('resume')}>
+            <span className="sidebar-icon">📄</span> <span className="sidebar-text">Resume</span>
+          </button>
+          <button className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>
+            <span className="sidebar-icon">✉️</span> <span className="sidebar-text">Messages</span> {messages.filter(m => !m.read).length > 0 && <span className="badge">{messages.filter(m => !m.read).length}</span>}
+          </button>
+          <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
+            <span className="sidebar-icon">👤</span> <span className="sidebar-text">Profile</span>
+          </button>
+        </nav>
+        <div className="sidebar-footer">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="btn-public-sidebar">
+            <span className="sidebar-icon">🌍</span> <span className="sidebar-text">View Site</span>
+          </a>
+          <button onClick={handleLogout} className="btn-logout-sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="logout-icon"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span className="sidebar-text">Logout</span>
+          </button>
+        </div>
+      </aside>
 
-      <div className="admin-tabs">
-        <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Projects</button>
-        <button className={activeTab === 'certificates' ? 'active' : ''} onClick={() => setActiveTab('certificates')}>Certificates</button>
-        <button className={activeTab === 'skills' ? 'active' : ''} onClick={() => setActiveTab('skills')}>Skills</button>
-        <button className={activeTab === 'resume' ? 'active' : ''} onClick={() => setActiveTab('resume')}>Resume</button>
-        <button className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>
-          Messages {messages.filter(m => !m.read).length > 0 && <span className="badge">{messages.filter(m => !m.read).length}</span>}
-        </button>
-        <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>Profile</button>
-      </div>
+      <main className="admin-main">
+        <div className="admin-stat-cards">
+          <div className="stat-card-admin"><h3>{projects.length}</h3><p>Projects</p></div>
+          <div className="stat-card-admin"><h3>{skills.length}</h3><p>Skills</p></div>
+          <div className="stat-card-admin"><h3>{certificates.length}</h3><p>Certificates</p></div>
+          <div className="stat-card-admin"><h3>{messages.length}</h3><p>Messages</p></div>
+        </div>
 
-      <div className="admin-content">
+        <div className="admin-content">
         {loadingData ? (
           <SkeletonLoader type={activeTab} />
         ) : (
@@ -804,8 +834,18 @@ const AdminDashboard = () => {
               </form>
             )}
 
+            <div className="skills-filter-container">
+              <button className={`filter-btn ${skillFilter === 'all' ? 'active' : ''}`} onClick={() => setSkillFilter('all')}>All</button>
+              <button className={`filter-btn ${skillFilter === 'frontend' ? 'active' : ''}`} onClick={() => setSkillFilter('frontend')}>🎨 Frontend</button>
+              <button className={`filter-btn ${skillFilter === 'backend' ? 'active' : ''}`} onClick={() => setSkillFilter('backend')}>⚙️ Backend</button>
+              <button className={`filter-btn ${skillFilter === 'tools' ? 'active' : ''}`} onClick={() => setSkillFilter('tools')}>🔧 Tools</button>
+              <button className={`filter-btn ${skillFilter === 'other' ? 'active' : ''}`} onClick={() => setSkillFilter('other')}>📦 Other</button>
+            </div>
+
             <div className="skills-list-enhanced">
               {['frontend', 'backend', 'tools', 'other'].map(category => {
+                if (skillFilter !== 'all' && skillFilter !== category) return null;
+                
                 const categorySkills = skills.filter(skill => skill.category === category);
                 if (categorySkills.length === 0) return null;
 
@@ -813,17 +853,17 @@ const AdminDashboard = () => {
 
                 return (
                   <div key={category} className="skill-category-admin">
-                    <div className="category-header-admin">
+                    <div className="skill-category-header">
                       <h3>{catLabels[category] || category}</h3>
                       <span className="category-count">{categorySkills.length}</span>
                     </div>
-                    <div className="skills-grid-admin">
+                    <div className="admin-skills-grid">
                       {categorySkills.map(skill => (
                         <div key={skill._id} className="skill-card-admin glass-morphism" style={{ '--skill-accent': skill.color || '#6366f1' }}>
                           <div className="skill-card-accent"></div>
                           <div className="skill-card-body">
                             <div className="skill-card-top">
-                              <div className="skill-card-icon">
+                              <div className="skill-card-icon-container">
                                 {skill.logoUrl || (skill.icon && (skill.icon.startsWith('http') || skill.icon.startsWith('/'))) ? (
                                   <img
                                     src={skill.logoUrl ? (skill.logoUrl.startsWith('http') ? skill.logoUrl : getApiUrl(skill.logoUrl)) : (skill.icon.startsWith('http') ? skill.icon : getApiUrl(skill.icon))}
@@ -1029,6 +1069,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 };
