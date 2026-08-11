@@ -1,298 +1,457 @@
+/* ═══════════════════════════════════════════
+   Skills Section — Professional Dashboard
+   ═══════════════════════════════════════════ */
+
+/* ── Section base ── */
 .skills-section {
-  background: rgba(15, 23, 42, 0.5);
-  padding: 6rem 0;
+  position: relative;
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-dark) 100%);
+  overflow: hidden;
 }
 
-.skills-main-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+.skills-section .container {
+  position: relative;
+  z-index: 1;
 }
 
-.skill-category-box,
-.tools-category-box {
-  padding: 1.5rem;
-  border-radius: 1.2rem;
-  height: 100%;
+/* ── Grid background ── */
+.sk-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
 }
 
-.skill-category-box h3,
-.tools-category-box h3 {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  color: var(--primary);
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.8rem;
+/* ── Floating orbs ── */
+.sk-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+  pointer-events: none;
+  z-index: 0;
+  animation: sk-orb-drift 14s ease-in-out infinite;
 }
 
-.skills-mini-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.2rem;
+.sk-orb--1 {
+  width: 450px;
+  height: 450px;
+  top: -8%;
+  left: -12%;
+  background: rgba(99, 102, 241, 0.1);
 }
 
-.skill-item-mini {
-  width: 100%;
+.sk-orb--2 {
+  width: 380px;
+  height: 380px;
+  bottom: -5%;
+  right: -10%;
+  background: rgba(16, 185, 129, 0.07);
+  animation-delay: -7s;
 }
 
-.skill-header-mini {
+@keyframes sk-orb-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-25px); }
+}
+
+/* ── Header ── */
+.skills-header {
+  margin-bottom: 2rem;
+}
+
+.skills-header .section-subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 560px;
+  margin-top: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════
+   Category Groups
+   ═══════════════════════════════════════════ */
+.sk-category-group {
+  margin-bottom: 3.5rem;
+}
+
+.sk-category-group:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Category Header ── */
+.sk-cat-header {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.5rem;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+  position: relative;
+  padding-bottom: 1rem;
 }
 
-.skill-logo-mini {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.sk-cat-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.sk-cat-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  line-height: 1;
   flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
+.sk-cat-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.3px;
+}
+
+.sk-cat-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.2rem 0.7rem;
+  border-radius: 2rem;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+}
+
+.sk-cat-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.4;
+}
+
+/* ═══════════════════════════════════════════
+   Cards Grid
+   ═══════════════════════════════════════════ */
+.sk-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1.35rem;
+}
+
+/* ── Individual Card ── */
+.sk-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  cursor: default;
+  perspective: 800px;
+}
+
+/* Animated gradient border */
+.sk-card-border {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 25%,
+    var(--sk-color) 50%,
+    transparent 75%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  animation: border-rotate 4s linear infinite;
+}
+
+.sk-card:hover .sk-card-border {
+  opacity: 1;
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-rotate {
+  to { --border-angle: 360deg; }
+}
+
+/* Inner card body */
+.sk-card-inner {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-light);
+  border-radius: inherit;
+  padding: 1.5rem 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+  overflow: hidden;
+}
+
+.sk-card:hover .sk-card-inner {
+  border-color: color-mix(in srgb, var(--sk-color) 40%, transparent);
+  box-shadow:
+    0 20px 50px -12px color-mix(in srgb, var(--sk-color) 20%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--sk-color) 10%, transparent);
+}
+
+/* Top color accent strip */
+.sk-accent-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--sk-color),
+    transparent
+  );
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.sk-card:hover .sk-accent-strip {
+  opacity: 1;
+}
+
+/* ── Icon area ── */
+.sk-icon-area {
+  position: relative;
+  margin-bottom: 0.25rem;
+}
+
+.sk-icon-ring {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sk-color) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--sk-color) 25%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s ease,
+    background 0.4s ease;
+  overflow: hidden;
+}
+
+.sk-card:hover .sk-icon-ring {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 8px 25px color-mix(in srgb, var(--sk-color) 30%, transparent);
+  background: color-mix(in srgb, var(--sk-color) 18%, transparent);
+}
+
+/* Logo sizing */
+.skill-logo-lg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.skill-logo-md {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.skill-svg-icon,
 .skill-icon-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  font-weight: bold;
-  color: var(--primary);
-}
-
-.skill-info-mini {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  font-weight: 500;
-  font-size: 0.85rem;
-}
-
-.progress-bar-mini {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-bar-mini .progress {
-  height: 100%;
-  background: var(--primary);
-}
-
-/* ============================================
-   Tools & Technologies — Marquee Section
-   ============================================ */
-
-.tools-marquee-section {
-  margin-top: 3rem;
-}
-
-.tools-marquee-title {
-  font-size: 1.2rem;
-  color: var(--primary);
-  text-align: center;
-  margin-bottom: 2rem;
-  letter-spacing: 0.5px;
-  position: relative;
-}
-
-.tools-marquee-title::after {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--accent, #a855f7));
-  margin: 0.6rem auto 0;
-  border-radius: 2px;
-}
-
-/* Marquee track — the visible window */
-.marquee-track {
-  overflow: hidden;
   width: 100%;
-  position: relative;
-  padding: 0.5rem 0;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 8%,
-    #000 92%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 8%,
-    #000 92%,
-    transparent 100%
-  );
+  height: 100%;
 }
 
-.marquee-track + .marquee-track {
-  margin-top: 0.75rem;
+.skill-icon-fallback {
+  font-size: 1.4rem;
+  color: var(--text-main);
 }
 
-/* Marquee content — the scrolling strip */
-.marquee-content {
-  display: flex;
-  gap: 1rem;
-  width: max-content;
-  will-change: transform;
+.skill-svg-icon svg {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
 }
 
-/* Scroll left (default direction) */
-.marquee-content.scroll-left {
-  animation: marquee-scroll-left 35s linear infinite;
-}
-
-/* Scroll right (reverse direction) */
-.marquee-content.scroll-right {
-  animation: marquee-scroll-right 40s linear infinite;
-}
-
-@keyframes marquee-scroll-left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-33.333%);
-  }
-}
-
-@keyframes marquee-scroll-right {
-  0% {
-    transform: translateX(-33.333%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-/* Pause on hover */
-.marquee-track:hover .marquee-content {
-  animation-play-state: paused;
-}
-
-/* Individual tool chip */
-.tool-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 1.1rem;
-  border-radius: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-}
-
-.tool-chip::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 2rem;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--chip-color, #6366f1) 12%, transparent),
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.tool-chip:hover {
-  border-color: color-mix(in srgb, var(--chip-color, #6366f1) 50%, transparent);
-  transform: translateY(-2px);
-  box-shadow:
-    0 4px 20px color-mix(in srgb, var(--chip-color, #6366f1) 25%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--chip-color, #6366f1) 15%, transparent);
-}
-
-.tool-chip:hover::before {
-  opacity: 1;
-}
-
-.tool-chip .skill-logo-mini {
-  width: 22px;
-  height: 22px;
-  position: relative;
-  z-index: 1;
-}
-
-.tool-chip span {
-  font-size: 0.82rem;
-  font-weight: 600;
+/* ── Name ── */
+.sk-name {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
   color: var(--text-main);
   letter-spacing: 0.3px;
-  position: relative;
-  z-index: 1;
+  text-align: center;
+  line-height: 1.3;
 }
 
-/* Existing tool badge styles (keep for backward compat) */
-.tools-mini-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.8rem;
-}
-
-.tool-badge-mini {
+/* ═══════════════════════════════════════════
+   5-Segment Level Meter
+   ═══════════════════════════════════════════ */
+.sk-level-meter {
   display: flex;
+  gap: 4px;
+  width: 100%;
+  padding: 0 0.15rem;
+}
+
+.sk-seg {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  transform-origin: left;
+  transition: background 0.3s ease;
+}
+
+.sk-seg.filled {
+  background: linear-gradient(
+    90deg,
+    var(--sk-color),
+    color-mix(in srgb, var(--sk-color) 70%, #fff)
+  );
+  box-shadow: 0 0 8px color-mix(in srgb, var(--sk-color) 40%, transparent);
+}
+
+.sk-card:hover .sk-seg.filled {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sk-color) 55%, transparent);
+}
+
+/* ── Bottom row: label + pct ── */
+.sk-bottom-row {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+  padding: 0 0.15rem;
 }
 
-.tool-logo-mini {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
+.sk-level-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--sk-color);
+  opacity: 0.85;
 }
 
-.tool-badge-mini span {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-main);
+.skill-pct-counter {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ============================================
+/* ═══════════════════════════════════════════
    Responsive
-   ============================================ */
-
-@media (max-width: 1100px) {
-  .skills-main-row {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+   ═══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .sk-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.1rem;
   }
 }
 
-@media (max-width: 768px) {
-  .tool-chip {
-    padding: 0.5rem 0.9rem;
-    gap: 0.5rem;
+@media (max-width: 600px) {
+  .sk-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
   }
 
-  .tool-chip span {
-    font-size: 0.75rem;
+  .sk-card-inner {
+    padding: 1.25rem 0.85rem 1rem;
   }
 
-  .tool-chip .skill-logo-mini {
-    width: 18px;
-    height: 18px;
+  .sk-icon-ring {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
   }
 
-  .marquee-content.scroll-left {
-    animation-duration: 25s;
+  .skill-logo-lg {
+    width: 24px;
+    height: 24px;
   }
 
-  .marquee-content.scroll-right {
-    animation-duration: 30s;
+  .sk-filter-btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .sk-filter-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Hide sliding indicator on small screens and use bg instead */
+  .sk-filter-indicator {
+    display: none;
+  }
+
+  .sk-filter-btn.active {
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+    box-shadow: 0 0 14px rgba(99, 102, 241, 0.3);
+  }
+}
+
+@media (max-width: 400px) {
+  .sk-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .sk-name {
+    font-size: 0.82rem;
+  }
+
+  .sk-seg {
+    height: 4px;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .sk-orb {
+    animation: none;
+  }
+
+  .sk-card-border {
+    animation: none;
+  }
+
+  .sk-card,
+  .sk-icon-ring {
+    transition: none;
   }
 }
